@@ -1,3 +1,30 @@
-code/
-code/main.py
-code/helper.py
+AI-100-Final_Project
+
+  AI-100 Final Project.pdf
+  AI-100 FInal Project.xlsx
+  code/
+import osmnx as ox
+import pandas as pd
+
+# 1. Define the area and tags
+place_name = "Minato City, Tokyo, Japan"
+tags = {'building': True}
+
+# 2. Download building footprints
+# Note: This downloads geometries for the area
+gdf = ox.features_from_place(place_name, tags)
+
+# 3. Filter for buildings updated within the last 2 years (2024-2026)
+# OSM provides a 'timestamp' for the last edit of an element
+gdf['timestamp'] = pd.to_datetime(gdf['timestamp'])
+two_years_ago = pd.Timestamp.now(tz='UTC') - pd.DateOffset(years=2)
+
+recent_buildings = gdf[gdf['timestamp'] >= two_years_ago]
+
+# 4. Display results
+print(f"Total buildings found: {len(gdf)}")
+print(f"Buildings updated/added since 2024: {len(recent_buildings)}")
+print(recent_buildings[['name', 'building', 'timestamp']].head())
+
+# Optional: Save to GeoJSON
+# recent_buildings.to_file("recent_japan_buildings.geojson", driver='GeoJSON')
